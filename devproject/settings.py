@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 
+from misago import load_plugin_list_if_exists
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -155,7 +157,11 @@ AUTHENTICATION_BACKENDS = ["misago.users.authbackends.MisagoBackend"]
 
 CSRF_FAILURE_VIEW = "misago.core.errorpages.csrf_failure"
 
-INSTALLED_APPS = [
+PLUGINS_LIST_PATH = os.path.join(os.path.dirname(BASE_DIR), "plugins.txt")
+
+INSTALLED_PLUGINS = load_plugin_list_if_exists(PLUGINS_LIST_PATH) or []
+
+INSTALLED_APPS = INSTALLED_PLUGINS + [
     # Misago overrides for Django core feature
     "misago",
     "misago.users",
@@ -195,6 +201,7 @@ INSTALLED_APPS = [
     "misago.faker",
     "misago.menus",
     "misago.sso",
+    "misago.plugins",
 ]
 
 INTERNAL_IPS = ["127.0.0.1"]
@@ -287,6 +294,7 @@ TEMPLATES = [
                 "misago.legal.context_processors.legal_links",
                 "misago.menus.context_processors.menus",
                 "misago.users.context_processors.user_links",
+                "misago.core.context_processors.hooks",
                 # Data preloaders
                 "misago.conf.context_processors.preload_settings_json",
                 "misago.core.context_processors.current_link",
